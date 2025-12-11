@@ -13,7 +13,48 @@ export async function addVehicle(formData: FormData) {
     redirect("/auth/login");
   }
 
-  // 2. Extract Data
+  // 2. Handle Image Uploads
+  const imageFiles = formData.getAll("images") as File[];
+  const imageUrls: string[] = [];
+
+  if (imageFiles.length > 0 && imageFiles[0].size > 0) {
+    for (const file of imageFiles) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        continue; // Skip non-image files
+      }
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const fileExtension = file.name.split(".").pop();
+      const fileName = `${user.id}/${timestamp}-${randomString}.${fileExtension}`;
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("vehicle-images")
+        .upload(fileName, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("Storage upload error:", uploadError);
+        continue; // Skip this file and continue with others
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("vehicle-images")
+        .getPublicUrl(fileName);
+
+      if (urlData?.publicUrl) {
+        imageUrls.push(urlData.publicUrl);
+      }
+    }
+  }
+
+  // 3. Extract Data
   const rawData = {
     vin: formData.get("vin") as string,
     make: formData.get("make") as string,
@@ -24,10 +65,11 @@ export async function addVehicle(formData: FormData) {
     color: formData.get("color") as string,
     mileage: parseInt(formData.get("mileage") as string),
     condition_notes: formData.get("condition") as string,
-    status: "Available"
+    status: "Available",
+    image_urls: imageUrls.length > 0 ? imageUrls : null
   };
 
-  // 3. Insert into Supabase
+  // 4. Insert into Supabase
   const { error } = await supabase
     .from("inventory")
     .insert([rawData]);
@@ -38,7 +80,7 @@ export async function addVehicle(formData: FormData) {
     redirect("/dashboard/add?error=Database Error"); 
   }
 
-  // 4. Success! Redirect to Dashboard
+  // 5. Success! Redirect to Dashboard
   revalidatePath("/dashboard");
   redirect("/dashboard");
 }
