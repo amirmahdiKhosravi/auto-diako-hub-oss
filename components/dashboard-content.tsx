@@ -180,11 +180,11 @@ export function DashboardContent({ vehicles }: DashboardContentProps) {
                         </div>
                       </div>
 
-                      {/* View Details Link */}
-                      <Button variant="outline" className="w-full gap-2 mt-2 border-border bg-transparent hover:bg-accent hover:text-accent-foreground transition-colors">
+                      {/* View Details Button - Visual only, card is clickable */}
+                      <div className="w-full mt-2 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-background shadow-sm pointer-events-none">
                         View Details
                         <ChevronRight className="w-4 h-4" />
-                      </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 </Link>
