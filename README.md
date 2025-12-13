@@ -86,6 +86,14 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 
   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
 
+  For the vehicle description generation feature, also add:
+
+  ```env
+  OPENAI_API_KEY=[INSERT YOUR OPENAI API KEY]
+  ```
+  > [!NOTE]
+  > The `OPENAI_API_KEY` is a server-side only environment variable (no `NEXT_PUBLIC_` prefix) to keep it secure. You can get your API key from [OpenAI's API keys page](https://platform.openai.com/api-keys).
+
 5. You can now run the Next.js local development server:
 
    ```bash
