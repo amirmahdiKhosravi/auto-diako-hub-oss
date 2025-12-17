@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { generateVehicleEmbedding } from "@/lib/embeddings";
 
 // VIN Decoding using NHTSA API
 async function decodeVIN(vin: string): Promise<{ make: string; model: string; year: number; trim: string; bodyClass: string } | null> {
@@ -187,7 +188,30 @@ export async function addVehicle(formData: FormData) {
   // 6. Calculate floor price if not provided
   const finalFloorPrice = floorPrice !== null ? floorPrice : Math.round(listedPrice * 0.9);
 
-  // 7. Handle Image Uploads
+  // 7. Generate Embedding
+  let vehicleEmbedding: number[] | null = null;
+  try {
+    vehicleEmbedding = await generateVehicleEmbedding({
+      make,
+      model,
+      year,
+      mileage,
+      color,
+      conditionNotes: conditionNotes || "",
+      description: finalDescription || undefined,
+      trim: trim || undefined,
+      bodyClass: bodyClass || undefined,
+      listedPrice,
+      floorPrice: finalFloorPrice,
+      vin: vin || undefined,
+    });
+  } catch (error) {
+    // Log error but don't block vehicle creation
+    console.error("Embedding generation failed:", error);
+    // Continue without embedding - vehicle creation will proceed
+  }
+
+  // 8. Handle Image Uploads
   const imageFiles = formData.getAll("images") as File[];
   const imageUrls: string[] = [];
 
@@ -228,7 +252,7 @@ export async function addVehicle(formData: FormData) {
     }
   }
 
-  // 8. Prepare data for insertion
+  // 9. Prepare data for insertion
   const rawData: Record<string, any> = {
     vin: vin,
     make,
@@ -253,7 +277,12 @@ export async function addVehicle(formData: FormData) {
     rawData.description = finalDescription;
   }
 
-  // 9. Insert into Supabase
+  // Add embedding if generated successfully
+  if (vehicleEmbedding) {
+    rawData.embedding = vehicleEmbedding;
+  }
+
+  // 10. Insert into Supabase
   const { error } = await supabase
     .from("inventory")
     .insert([rawData]);
@@ -263,7 +292,7 @@ export async function addVehicle(formData: FormData) {
     throw new Error("Failed to save vehicle. Please try again.");
   }
 
-  // 10. Success! Redirect to Dashboard
+  // 11. Success! Redirect to Dashboard
   revalidatePath("/dashboard");
   redirect("/dashboard");
 }
