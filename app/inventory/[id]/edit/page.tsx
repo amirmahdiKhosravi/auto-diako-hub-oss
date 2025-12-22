@@ -8,13 +8,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { Suspense } from "react";
 
 interface EditVehiclePageProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ error?: string }>;
 }
 
-async function EditVehicleForm({ vehicleId }: { vehicleId: string }) {
+async function EditVehicleForm({ paramsPromise }: { paramsPromise: Promise<{ id: string }> }) {
+  const { id: vehicleId } = await paramsPromise;
   const supabase = await createClient();
 
   // 1. Verify User is Logged In
@@ -202,23 +204,35 @@ async function EditVehicleForm({ vehicleId }: { vehicleId: string }) {
   );
 }
 
-export default async function EditVehiclePage({
+async function ErrorDisplay({ searchParamsPromise }: { searchParamsPromise: Promise<{ error?: string }> }) {
+  const { error } = await searchParamsPromise;
+  if (!error) return null;
+  
+  return (
+    <div className="max-w-2xl mx-auto px-6 pt-6">
+      <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-md">
+        Error: {error}
+      </div>
+    </div>
+  );
+}
+
+export default function EditVehiclePage({
   params,
   searchParams,
 }: EditVehiclePageProps) {
-  const { id } = await params;
-  const { error } = await searchParams;
-
   return (
     <>
-      {error && (
-        <div className="max-w-2xl mx-auto px-6 pt-6">
-          <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded-md">
-            Error: {error}
-          </div>
+      <Suspense fallback={null}>
+        <ErrorDisplay searchParamsPromise={searchParams} />
+      </Suspense>
+      <Suspense fallback={
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-muted-foreground">Loading...</div>
         </div>
-      )}
-      <EditVehicleForm vehicleId={id} />
+      }>
+        <EditVehicleForm paramsPromise={params} />
+      </Suspense>
     </>
   );
 }

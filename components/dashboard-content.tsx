@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Plus, ChevronRight, Zap, Search } from "lucide-react"
-import { useSearchTerm } from "@/app/dashboard/layout"
+import { useSearchTerm } from "@/lib/search-context"
 import { cn } from "@/lib/utils"
 
 interface Vehicle {

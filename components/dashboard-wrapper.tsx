@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchTerm } from "@/app/dashboard/layout";
+import { useSearchTerm } from "@/lib/search-context";
 import { DashboardContent } from "@/components/dashboard-content";
 
 interface DashboardWrapperProps {
