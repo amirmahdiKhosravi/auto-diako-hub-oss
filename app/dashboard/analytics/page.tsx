@@ -6,7 +6,7 @@ export default function AnalyticsPage() {
         <p className="text-lg text-muted-foreground">
           View insights and analytics for your dealership performance.
         </p>
-        <div className="mt-8 p-8 border border-dashed border-slate-300 rounded-lg text-center">
+        <div className="mt-8 p-8 border border-dashed border-border rounded-lg text-center">
           <p className="text-muted-foreground">Analytics feature coming soon...</p>
         </div>
       </div>

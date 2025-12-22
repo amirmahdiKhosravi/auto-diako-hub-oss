@@ -6,7 +6,10 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, ChevronRight, Zap } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Plus, ChevronRight, Zap, Search } from "lucide-react"
+import { useSearchTerm } from "@/app/dashboard/layout"
+import { cn } from "@/lib/utils"
 
 interface Vehicle {
   id: string
@@ -29,7 +32,10 @@ interface DashboardContentProps {
   searchTerm?: string
 }
 
-export function DashboardContent({ vehicles, searchTerm = "" }: DashboardContentProps) {
+export function DashboardContent({ vehicles, searchTerm: propSearchTerm }: DashboardContentProps) {
+  const { searchTerm: contextSearchTerm, setSearchTerm } = useSearchTerm()
+  const searchTerm = propSearchTerm || contextSearchTerm || ""
+
   const filteredVehicles = useMemo(() => {
     if (!searchTerm) return vehicles
     
@@ -46,13 +52,51 @@ export function DashboardContent({ vehicles, searchTerm = "" }: DashboardContent
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8">
       <div className="space-y-8">
-        <div className="space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">Vehicle Inventory</h1>
-          <p className="text-lg text-muted-foreground">Browse and manage available vehicles in your dealership</p>
+        {/* Search and Add Vehicle Section */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="space-y-4 flex-1 w-full sm:w-auto">
+            <h1 className="text-4xl font-bold text-foreground">Vehicle Inventory</h1>
+            <p className="text-lg text-muted-foreground">Browse and manage available vehicles in your dealership</p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto sm:min-w-[400px]">
+            {/* Search Bar */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+              <Input
+                type="text"
+                placeholder="Search inventory by VIN, model, or stock #..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={cn(
+                  "pl-10 h-10 rounded-lg border-border bg-background",
+                  "focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-ring",
+                  "transition-all duration-200",
+                  "placeholder:text-muted-foreground"
+                )}
+              />
+            </div>
+
+            {/* Add Vehicle Button */}
+            <Link href="/dashboard/add">
+              <Button
+                className={cn(
+                  "h-10 px-4 gap-2 bg-blue-600 hover:bg-blue-700 text-white",
+                  "rounded-lg shadow-sm hover:shadow-md",
+                  "transition-all duration-200",
+                  "font-medium w-full sm:w-auto"
+                )}
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">Add Vehicle</span>
+                <span className="sm:hidden">Add</span>
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-card/50 border-border hover:bg-card/70 transition-colors">
+          <Card className="bg-card border-border hover:bg-accent/50 transition-colors">
             <CardContent className="pt-6">
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">Total Vehicles</p>
@@ -60,7 +104,7 @@ export function DashboardContent({ vehicles, searchTerm = "" }: DashboardContent
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-card/50 border-border hover:bg-card/70 transition-colors">
+          <Card className="bg-card border-border hover:bg-accent/50 transition-colors">
             <CardContent className="pt-6">
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">Total Inventory Value</p>
@@ -70,7 +114,7 @@ export function DashboardContent({ vehicles, searchTerm = "" }: DashboardContent
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-card/50 border-border hover:bg-card/70 transition-colors">
+          <Card className="bg-card border-border hover:bg-accent/50 transition-colors">
             <CardContent className="pt-6">
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">Available</p>
@@ -84,7 +128,7 @@ export function DashboardContent({ vehicles, searchTerm = "" }: DashboardContent
 
         <div className="mt-12">
           {filteredVehicles.length === 0 ? (
-            <Card className="bg-card/50 border-border">
+            <Card className="bg-card border-border">
               <CardContent className="py-16 text-center">
                 <p className="text-muted-foreground text-lg mb-6">
                   {searchTerm ? "No vehicles found matching your search" : "No vehicles found. Add one to get started."}
@@ -101,7 +145,7 @@ export function DashboardContent({ vehicles, searchTerm = "" }: DashboardContent
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredVehicles.map((vehicle) => (
                 <Link key={vehicle.id} href={`/inventory/${vehicle.id}`}>
-                  <Card className="overflow-hidden hover:border-primary transition-all duration-200 cursor-pointer h-full bg-card/50 border-border hover:bg-card hover:shadow-lg">
+                  <Card className="overflow-hidden hover:border-primary transition-all duration-200 cursor-pointer h-full bg-card border-border hover:bg-accent/50 hover:shadow-lg">
                     {vehicle.image_urls && vehicle.image_urls.length > 0 ? (
                       <div className="h-48 w-full relative overflow-hidden">
                         <Image

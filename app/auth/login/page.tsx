@@ -84,7 +84,7 @@ export default function LoginPage({
                 type="email" 
                 required 
                 placeholder="admin@autodiako.com"
-                className="bg-white"
+                className="bg-white text-gray-900 dark:text-gray-900"
               />
             </div>
             
@@ -95,7 +95,7 @@ export default function LoginPage({
                 id="password" 
                 name="password" 
                 required
-                className="bg-white"
+                className="bg-white text-gray-900 dark:text-gray-900"
               />
             </div>
 

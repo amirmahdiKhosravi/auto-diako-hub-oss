@@ -6,7 +6,7 @@ export default function LeadsPage() {
         <p className="text-lg text-muted-foreground">
           Manage and track your sales leads here.
         </p>
-        <div className="mt-8 p-8 border border-dashed border-slate-300 rounded-lg text-center">
+        <div className="mt-8 p-8 border border-dashed border-border rounded-lg text-center">
           <p className="text-muted-foreground">Leads feature coming soon...</p>
         </div>
       </div>

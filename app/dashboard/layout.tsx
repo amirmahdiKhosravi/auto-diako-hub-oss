@@ -27,7 +27,7 @@ export default function DashboardLayout({
 
   return (
     <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
-      <div className="flex h-screen bg-slate-50">
+      <div className="flex h-screen bg-background">
         {/* Desktop Sidebar */}
         <DashboardSidebar />
 
@@ -41,10 +41,8 @@ export default function DashboardLayout({
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col lg:pl-64 overflow-hidden">
-          {/* Top Navigation */}
+          {/* Top Navigation - Only mobile menu button */}
           <DashboardTopNav
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
             onMenuClick={() => setMobileMenuOpen(true)}
           />
 
