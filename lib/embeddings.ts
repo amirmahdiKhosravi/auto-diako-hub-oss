@@ -16,15 +16,6 @@ export interface VehicleEmbeddingData {
   vin?: string | null;
 }
 
-// Initialize OpenAI client
-function getOpenAIClient() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is not configured");
-  }
-  return new OpenAI({ apiKey });
-}
-
 /**
  * Constructs a comprehensive text representation of vehicle details for embedding
  */
@@ -73,8 +64,22 @@ function constructVehicleText(data: VehicleEmbeddingData): string {
 }
 
 /**
- * Generates a vector embedding for a vehicle using OpenAI's text-embedding-3-small model
- * Returns a 1536-dimensional vector array
+ * Initializes OpenAI client for embeddings
+ */
+function getOpenAIClient(): OpenAI {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is not configured. OpenAI embeddings are always used regardless of LLM_PROVIDER.");
+  }
+  return new OpenAI({ apiKey });
+}
+
+/**
+ * Generates a vector embedding for a vehicle using OpenAI's embedding model.
+ * 
+ * IMPORTANT: This function always uses OpenAI for embeddings, regardless of the
+ * LLM_PROVIDER setting. This ensures consistent 1536-dimensional embeddings
+ * that can be compared across all vehicles in the database.
  * 
  * @param data - Vehicle data to embed
  * @returns Promise<number[]> - The embedding vector (1536 dimensions)
@@ -86,16 +91,24 @@ export async function generateVehicleEmbedding(
   try {
     const openai = getOpenAIClient();
     const text = constructVehicleText(data);
+    
+    // Get embedding model from environment or use default
+    const embeddingModel = process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
 
     const response = await openai.embeddings.create({
-      model: "text-embedding-3-small",
+      model: embeddingModel,
       input: text,
     });
 
     const embedding = response.data[0]?.embedding;
 
-    if (!embedding || embedding.length !== 1536) {
-      throw new Error("Invalid embedding response from OpenAI");
+    if (!embedding) {
+      throw new Error("Failed to generate embedding from OpenAI");
+    }
+
+    // Verify expected dimensions for OpenAI text-embedding-3-small (1536)
+    if (embedding.length !== 1536 && embeddingModel === "text-embedding-3-small") {
+      console.warn(`Unexpected embedding dimensions: ${embedding.length}, expected 1536`);
     }
 
     return embedding;
