@@ -86,13 +86,27 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 
   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
 
-  For the vehicle description generation feature, also add:
+  For the vehicle description generation and embedding features, also add:
 
   ```env
+  # LLM Provider Configuration
+  LLM_PROVIDER=openai  # or "gemini" to use Google Gemini
+
+  # OpenAI Configuration (required when using OpenAI)
   OPENAI_API_KEY=[INSERT YOUR OPENAI API KEY]
+  OPENAI_MODEL=gpt-4o  # Optional, defaults to gpt-4o
+  OPENAI_EMBEDDING_MODEL=text-embedding-3-small  # Optional, defaults to text-embedding-3-small
+
+  # Gemini Configuration (required when using Gemini)
+  GEMINI_API_KEY=[INSERT YOUR GEMINI API KEY]
+  GEMINI_MODEL=gemini-pro  # Optional, defaults to gemini-pro
+  GEMINI_EMBEDDING_MODEL=gemini-embedding-001  # Optional, defaults to gemini-embedding-001
   ```
   > [!NOTE]
-  > The `OPENAI_API_KEY` is a server-side only environment variable (no `NEXT_PUBLIC_` prefix) to keep it secure. You can get your API key from [OpenAI's API keys page](https://platform.openai.com/api-keys).
+  > - The API keys are server-side only environment variables (no `NEXT_PUBLIC_` prefix) to keep them secure.
+  > - You can switch between providers by changing `LLM_PROVIDER` to `"openai"` or `"gemini"`.
+  > - Get your OpenAI API key from [OpenAI's API keys page](https://platform.openai.com/api-keys).
+  > - Get your Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey).
 
 5. You can now run the Next.js local development server:
 

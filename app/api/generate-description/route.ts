@@ -1,6 +1,6 @@
-import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createLLMProvider } from "@/lib/llm/factory";
 
 // Type definitions
 interface GenerateDescriptionRequest {
@@ -19,15 +19,6 @@ interface GenerateDescriptionResponse {
 
 interface ErrorResponse {
   error: string;
-}
-
-// Initialize OpenAI client
-function getOpenAIClient() {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is not configured");
-  }
-  return new OpenAI({ apiKey });
 }
 
 // Validate request body
@@ -91,12 +82,12 @@ export async function POST(req: Request) {
 
     const { make, model, year, mileage, condition, trim, bodyClass } = body;
 
-    // 3. Validate OpenAI API key exists
-    let openai: OpenAI;
+    // 3. Initialize LLM provider
+    let llmProvider;
     try {
-      openai = getOpenAIClient();
+      llmProvider = createLLMProvider();
     } catch (error) {
-      console.error("OpenAI configuration error:", error);
+      console.error("LLM provider configuration error:", error);
       return NextResponse.json<ErrorResponse>(
         { error: "Service configuration error" },
         { status: 500 }
@@ -128,29 +119,17 @@ ${vehicleInfo}
 Mileage: ${mileage} km
 Condition/Notes: ${condition}`;
 
-    // 5. Call GPT-4o
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: systemMessage },
-        { role: "user", content: userMessage },
-      ],
+    // 5. Generate description using LLM provider
+    const result = await llmProvider.generateChatCompletion({
+      systemMessage,
+      userMessage,
       temperature: 0.7,
-      max_tokens: 300,
+      maxTokens: 300,
     });
-
-    const generatedText = completion.choices[0]?.message?.content;
-
-    if (!generatedText) {
-      return NextResponse.json<ErrorResponse>(
-        { error: "Failed to generate description" },
-        { status: 500 }
-      );
-    }
 
     // 6. Return the generated description
     return NextResponse.json<GenerateDescriptionResponse>({
-      description: generatedText,
+      description: result.content,
     });
   } catch (error) {
     // Handle all errors - ensure we always return JSON
