@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { generateVehicleEmbedding } from "@/lib/embeddings";
+import { createLLMProvider } from "@/lib/llm/factory";
 
 // VIN Decoding using NHTSA API
 async function decodeVIN(vin: string): Promise<{ make: string; model: string; year: number; trim: string; bodyClass: string } | null> {
@@ -116,71 +117,50 @@ export async function addVehicle(formData: FormData) {
   let finalDescription = description;
   if (!finalDescription) {
     try {
-      // Get base URL for API route (server-side)
-      // In production, use NEXT_PUBLIC_SITE_URL or construct from VERCEL_URL
-      // In development, use localhost
-      let baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
-      if (!baseUrl && process.env.VERCEL_URL) {
-        baseUrl = `https://${process.env.VERCEL_URL}`;
-      }
-      if (!baseUrl) {
-        baseUrl = "http://localhost:3000";
-      }
+      // Call LLM provider directly from server action (no need for HTTP request)
+      const llmProvider = createLLMProvider();
       
-      const apiUrl = `${baseUrl}/api/generate-description`;
-      
-      const requestBody: Record<string, unknown> = {
-        make,
-        model,
-        year,
-        mileage,
-        condition: conditionNotes || "No additional notes provided.",
-      };
-      
-      // Add optional fields if available
-      if (trim) requestBody.trim = trim;
-      if (bodyClass) requestBody.bodyClass = bodyClass;
+      const systemMessage = `You are an expert car salesman writing a Facebook Marketplace listing.
+Write catchy, professional descriptions for vehicles.
 
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+Rules:
+- Use bullet points for features
+- Use emojis to make it pop
+- Tone: Excited but trustworthy
+- Keep it under 150 words
+- Do NOT include a price (it's listed in a separate field)`;
+
+      let vehicleInfo = `Vehicle: ${year} ${make} ${model}`;
+      if (trim) {
+        vehicleInfo += ` ${trim}`;
+      }
+      if (bodyClass) {
+        vehicleInfo += `\nStyle: ${bodyClass}`;
+      }
+      
+      const userMessage = `Write a description for this vehicle:
+
+${vehicleInfo}
+Mileage: ${mileage} km
+Condition/Notes: ${conditionNotes || "No additional notes provided."}`;
+
+      const result = await llmProvider.generateChatCompletion({
+        systemMessage,
+        userMessage,
+        temperature: 0.7,
+        maxTokens: 300,
       });
 
-      if (response.ok) {
-        // Check if response is actually JSON before parsing
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          try {
-            const data = await response.json();
-            finalDescription = data.description || "";
-          } catch (parseError) {
-            console.error("Failed to parse JSON response:", parseError);
-            finalDescription = conditionNotes || "Contact us for details.";
-          }
-        } else {
-          // Response is not JSON (likely HTML error page)
-          const text = await response.text();
-          console.error("API route returned non-JSON response:", text.substring(0, 200));
-          finalDescription = conditionNotes || "Contact us for details.";
-        }
+      if (result?.content && result.content.trim()) {
+        finalDescription = result.content;
       } else {
-        // Try to get error message from response
-        const contentType = response.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-          try {
-            const errorData = await response.json();
-            console.error("API route error:", response.status, errorData.error || response.statusText);
-          } catch {
-            console.error("API route error:", response.status, response.statusText);
-          }
-        } else {
-          console.error("API route error:", response.status, response.statusText);
-        }
+        console.error("LLM returned empty description");
         finalDescription = conditionNotes || "Contact us for details.";
       }
     } catch (error) {
-      console.error("AI Generation Error:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("AI Generation Error:", errorMessage);
+      console.error("Full error:", error);
       finalDescription = conditionNotes || "Contact us for details.";
     }
   }

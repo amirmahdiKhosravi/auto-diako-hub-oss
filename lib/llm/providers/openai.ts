@@ -31,28 +31,37 @@ export class OpenAIProvider implements LLMProviderInterface {
   async generateChatCompletion(
     config: ChatCompletionConfig
   ): Promise<ChatCompletionResponse> {
-    const messages: Array<{ role: "system" | "user"; content: string }> = [];
+    try {
+      const messages: Array<{ role: "system" | "user"; content: string }> = [];
 
-    if (config.systemMessage) {
-      messages.push({ role: "system", content: config.systemMessage });
+      if (config.systemMessage) {
+        messages.push({ role: "system", content: config.systemMessage });
+      }
+
+      messages.push({ role: "user", content: config.userMessage });
+
+      const completion = await this.client.chat.completions.create({
+        model: this.chatModel,
+        messages,
+        temperature: config.temperature ?? 0.7,
+        max_tokens: config.maxTokens ?? 300,
+      });
+
+      const content = completion.choices[0]?.message?.content;
+
+      if (!content) {
+        throw new Error("Failed to generate completion from OpenAI: Empty response");
+      }
+
+      return { content };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("[OpenAI Provider] Error generating completion:", errorMessage);
+      if (error instanceof Error && error.stack) {
+        console.error("[OpenAI Provider] Error stack:", error.stack);
+      }
+      throw new Error(`OpenAI API error: ${errorMessage}`);
     }
-
-    messages.push({ role: "user", content: config.userMessage });
-
-    const completion = await this.client.chat.completions.create({
-      model: this.chatModel,
-      messages,
-      temperature: config.temperature ?? 0.7,
-      max_tokens: config.maxTokens ?? 300,
-    });
-
-    const content = completion.choices[0]?.message?.content;
-
-    if (!content) {
-      throw new Error("Failed to generate completion from OpenAI");
-    }
-
-    return { content };
   }
 
   async generateEmbedding(config: EmbeddingConfig): Promise<EmbeddingResponse> {

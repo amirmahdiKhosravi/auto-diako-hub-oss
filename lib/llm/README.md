@@ -24,7 +24,8 @@ The abstraction follows a strategy pattern with the following structure:
 
 ### Gemini Configuration
 - `GEMINI_API_KEY`: Your Google Gemini API key (required when using Gemini)
-- `GEMINI_MODEL`: Model for chat completions (default: `gemini-pro`)
+- `GEMINI_MODEL`: Model for chat completions (default: `gemini-2.5-flash`)
+  - Valid options: `gemini-pro`, `gemini-1.5-pro`, `gemini-2.5-flash`, `gemini-2.0-flash-exp`
 - `GEMINI_EMBEDDING_MODEL`: Model for embeddings (default: `gemini-embedding-001`)
 
 ## Usage

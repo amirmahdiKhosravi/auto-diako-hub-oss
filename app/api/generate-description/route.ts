@@ -85,11 +85,15 @@ export async function POST(req: Request) {
     // 3. Initialize LLM provider
     let llmProvider;
     try {
+      console.log("[API] Initializing LLM provider...");
       llmProvider = createLLMProvider();
+      console.log("[API] LLM provider initialized successfully");
     } catch (error) {
-      console.error("LLM provider configuration error:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("[API] LLM provider configuration error:", errorMessage);
+      console.error("[API] Full error:", error);
       return NextResponse.json<ErrorResponse>(
-        { error: "Service configuration error" },
+        { error: `Service configuration error: ${errorMessage}` },
         { status: 500 }
       );
     }
@@ -120,14 +124,39 @@ Mileage: ${mileage} km
 Condition/Notes: ${condition}`;
 
     // 5. Generate description using LLM provider
-    const result = await llmProvider.generateChatCompletion({
-      systemMessage,
-      userMessage,
-      temperature: 0.7,
-      maxTokens: 300,
-    });
+    let result;
+    try {
+      console.log("[API] Calling LLM generateChatCompletion...");
+      console.log("[API] User message length:", userMessage.length);
+      result = await llmProvider.generateChatCompletion({
+        systemMessage,
+        userMessage,
+        temperature: 0.7,
+        maxTokens: 300,
+      });
+      console.log("[API] LLM generation successful, content length:", result?.content?.length || 0);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("[API] LLM generation error:", errorMessage);
+      console.error("[API] Full error:", error);
+      if (error instanceof Error && error.stack) {
+        console.error("[API] Error stack:", error.stack);
+      }
+      return NextResponse.json<ErrorResponse>(
+        { error: `Failed to generate description: ${errorMessage}` },
+        { status: 500 }
+      );
+    }
 
     // 6. Return the generated description
+    if (!result?.content) {
+      console.error("LLM returned empty content");
+      return NextResponse.json<ErrorResponse>(
+        { error: "LLM returned empty response" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json<GenerateDescriptionResponse>({
       description: result.content,
     });
