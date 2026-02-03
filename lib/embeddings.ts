@@ -11,6 +11,9 @@ export interface VehicleEmbeddingData {
   description?: string;
   trim?: string;
   bodyClass?: string;
+  bodyStyle?: string;
+  transmission?: string;
+  fuelType?: string;
   listedPrice?: number;
   floorPrice?: number;
   vin?: string | null;
@@ -31,6 +34,15 @@ function constructVehicleText(data: VehicleEmbeddingData): string {
   
   if (data.bodyClass) {
     parts.push(`Body Style: ${data.bodyClass}`);
+  }
+  if (data.bodyStyle) {
+    parts.push(`Body Type: ${data.bodyStyle}`);
+  }
+  if (data.transmission) {
+    parts.push(`Transmission: ${data.transmission}`);
+  }
+  if (data.fuelType) {
+    parts.push(`Fuel Type: ${data.fuelType}`);
   }
 
   // Physical attributes

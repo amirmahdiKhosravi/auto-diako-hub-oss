@@ -25,6 +25,11 @@ interface Vehicle {
   condition_notes: string
   created_at: string
   image_urls?: string[] | null
+  body_style?: string | null
+  transmission?: string | null
+  fuel_type?: string | null
+  vehicle_condition?: string | null
+  trim?: string | null
 }
 
 interface DashboardContentProps {
@@ -43,8 +48,11 @@ export function DashboardContent({ vehicles, searchTerm: propSearchTerm }: Dashb
     return vehicles.filter((v) => {
       return (
         `${v.year} ${v.make} ${v.model}`.toLowerCase().includes(searchLower) ||
-        v.vin.toLowerCase().includes(searchLower) ||
-        v.color.toLowerCase().includes(searchLower)
+        (v.vin && v.vin.toLowerCase().includes(searchLower)) ||
+        v.color.toLowerCase().includes(searchLower) ||
+        (v.body_style && v.body_style.toLowerCase().includes(searchLower)) ||
+        (v.transmission && v.transmission.toLowerCase().includes(searchLower)) ||
+        (v.trim && v.trim.toLowerCase().includes(searchLower))
       )
     })
   }, [searchTerm, vehicles])
@@ -184,6 +192,18 @@ export function DashboardContent({ vehicles, searchTerm: propSearchTerm }: Dashb
                           <p className="text-muted-foreground">Color</p>
                           <p className="font-semibold text-foreground">{vehicle.color}</p>
                         </div>
+                        {vehicle.body_style && (
+                          <div className="space-y-1">
+                            <p className="text-muted-foreground">Body Style</p>
+                            <p className="font-semibold text-foreground">{vehicle.body_style}</p>
+                          </div>
+                        )}
+                        {vehicle.transmission && (
+                          <div className="space-y-1">
+                            <p className="text-muted-foreground">Transmission</p>
+                            <p className="font-semibold text-foreground">{vehicle.transmission}</p>
+                          </div>
+                        )}
                       </div>
 
                       <div className="pt-2 border-t border-border space-y-2">

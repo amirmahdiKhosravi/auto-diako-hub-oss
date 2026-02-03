@@ -97,6 +97,77 @@ export default function AddVehicleForm() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="body_style">Body Style</Label>
+                  <select id="body_style" name="body_style" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                    <option value="">Select...</option>
+                    <option value="SEDAN">Sedan</option>
+                    <option value="SUV">SUV</option>
+                    <option value="TRUCK">Truck</option>
+                    <option value="HATCHBACK">Hatchback</option>
+                    <option value="COUPE">Coupe</option>
+                    <option value="CONVERTIBLE">Convertible</option>
+                    <option value="VAN">Van</option>
+                    <option value="MINIVAN">Minivan</option>
+                    <option value="CROSSOVER">Crossover</option>
+                    <option value="WAGON">Wagon</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="transmission">Transmission</Label>
+                  <select id="transmission" name="transmission" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                    <option value="">Select...</option>
+                    <option value="Automatic">Automatic</option>
+                    <option value="Manual">Manual</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fuel_type">Fuel Type</Label>
+                  <select id="fuel_type" name="fuel_type" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                    <option value="">Select...</option>
+                    <option value="Gasoline">Gasoline</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Electric</option>
+                    <option value="Hybrid">Hybrid</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vehicle_condition">Condition</Label>
+                  <select id="vehicle_condition" name="vehicle_condition" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                    <option value="">Select...</option>
+                    <option value="EXCELLENT">Excellent</option>
+                    <option value="GOOD">Good</option>
+                    <option value="FAIR">Fair</option>
+                    <option value="POOR">Poor</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="trim">Trim (Optional)</Label>
+                  <Input id="trim" name="trim" placeholder="LX, Sport, etc." />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="latitude">Latitude (Optional)</Label>
+                  <Input id="latitude" name="latitude" type="number" step="any" placeholder="43.5890" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="longitude">Longitude (Optional)</Label>
+                  <Input id="longitude" name="longitude" type="number" step="any" placeholder="-79.6441" />
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border border-border">
                 <div className="space-y-2">
                   <Label htmlFor="price">Listed Price ($)</Label>
@@ -184,6 +255,75 @@ export default function AddVehicleForm() {
                   <Label htmlFor="carfax_link">Carfax Link (Optional)</Label>
                   <Input id="carfax_link" name="carfax_link" type="url" placeholder="https://vhr.carfax.ca/..." />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="body_style">Body Style</Label>
+                  <select id="body_style" name="body_style" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                    <option value="">Select...</option>
+                    <option value="SEDAN">Sedan</option>
+                    <option value="SUV">SUV</option>
+                    <option value="TRUCK">Truck</option>
+                    <option value="HATCHBACK">Hatchback</option>
+                    <option value="COUPE">Coupe</option>
+                    <option value="CONVERTIBLE">Convertible</option>
+                    <option value="VAN">Van</option>
+                    <option value="MINIVAN">Minivan</option>
+                    <option value="CROSSOVER">Crossover</option>
+                    <option value="WAGON">Wagon</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="transmission">Transmission</Label>
+                  <select id="transmission" name="transmission" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                    <option value="">Select...</option>
+                    <option value="Automatic">Automatic</option>
+                    <option value="Manual">Manual</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fuel_type">Fuel Type</Label>
+                  <select id="fuel_type" name="fuel_type" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                    <option value="">Select...</option>
+                    <option value="Gasoline">Gasoline</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Electric</option>
+                    <option value="Hybrid">Hybrid</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vehicle_condition">Condition</Label>
+                  <select id="vehicle_condition" name="vehicle_condition" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                    <option value="">Select...</option>
+                    <option value="EXCELLENT">Excellent</option>
+                    <option value="GOOD">Good</option>
+                    <option value="FAIR">Fair</option>
+                    <option value="POOR">Poor</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="trim">Trim (Optional - auto-filled from VIN)</Label>
+                  <Input id="trim" name="trim" placeholder="Auto-filled from VIN decode" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="latitude">Latitude (Optional)</Label>
+                  <Input id="latitude" name="latitude" type="number" step="any" placeholder="43.5890" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="longitude">Longitude (Optional)</Label>
+                <Input id="longitude" name="longitude" type="number" step="any" placeholder="-79.6441" />
               </div>
 
               <div className="space-y-2">
