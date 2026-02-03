@@ -18,8 +18,28 @@ function escape(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
+// Strip URLs from text so Facebook does not treat description as URL field
+function stripUrls(text: string): string {
+  if (!text) return "";
+  return text.replace(/https?:\/\/\S+/gi, "(link removed)").trim();
+}
+
+// True if string is a valid absolute URL for the feed
+function isValidFeedUrl(url: string): boolean {
+  const trimmed = typeof url === "string" ? url.trim() : "";
+  return trimmed.startsWith("http://") || trimmed.startsWith("https://");
+}
+
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  // Normalize base URL (no trailing slash) to avoid malformed listing URLs
+  const baseUrlRaw = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const baseUrl = baseUrlRaw.replace(/\/$/, "");
+
+  // Street address required by Facebook catalog (env, fallback if unset)
+  const streetAddress =
+    process.env.NEXT_PUBLIC_DEALER_STREET_ADDRESS ||
+    process.env.FACEBOOK_CATALOG_STREET_ADDRESS ||
+    "Address not specified";
 
   // 1. Fetch Active Inventory
   const { data: cars, error } = await supabase
@@ -43,16 +63,22 @@ export async function GET() {
     // Construct absolute URL for the vehicle page
     const carLink = `${baseUrl}/inventory/${car.id}`;
 
-    // Handle Images: Use image_urls (schema) - ensure full URLs
-    const imageUrls = car.image_urls && Array.isArray(car.image_urls) ? car.image_urls : [];
-    const getImageUrl = (pathOrUrl: string) =>
-      pathOrUrl.startsWith("http")
-        ? pathOrUrl
-        : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vehicles/${pathOrUrl}`;
+    // Handle Images: Use image_urls (schema) - ensure full URLs, validate format
+    const rawImageUrls = car.image_urls && Array.isArray(car.image_urls) ? car.image_urls : [];
+    const getImageUrl = (pathOrUrl: string) => {
+      const s = typeof pathOrUrl === "string" ? pathOrUrl.trim() : "";
+      return s.startsWith("http") ? s : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vehicles/${s}`.trim();
+    };
+    // Only include valid absolute URLs (Facebook rejects malformed or multiple links)
+    const imageUrls = rawImageUrls
+      .filter((url: unknown): url is string => typeof url === "string" && isValidFeedUrl(getImageUrl(url)))
+      .slice(0, 20);
 
     // Schema: listed_price, description ?? condition_notes, color
     const price = car.listed_price ?? car.floor_price ?? 0;
-    const description = car.description ?? car.condition_notes ?? "";
+    // Sanitize description: strip URLs so Facebook does not treat it as URL field
+    const rawDescription = car.description ?? car.condition_notes ?? "";
+    const description = stripUrls(rawDescription);
     const exteriorColor = car.color ?? "Unknown";
 
     // Use real fields from DB, fallbacks for backwards compatibility
@@ -70,7 +96,6 @@ export async function GET() {
     const imageElements =
       imageUrls.length > 0
         ? imageUrls
-            .slice(0, 20) // Facebook max 20 images
             .map((img: string) => `<image><url>${escape(getImageUrl(img))}</url></image>`)
             .join("\n        ")
         : "";
@@ -87,6 +112,7 @@ export async function GET() {
     const lon = car.longitude ?? -79.644;
     const addressXml = `
         <address format="simple">
+          <component name="addr1">${escape(streetAddress)}</component>
           <component name="city">Mississauga</component>
           <component name="region">Ontario</component>
           <component name="country">CA</component>
