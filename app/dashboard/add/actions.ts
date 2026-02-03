@@ -75,8 +75,19 @@ export async function addVehicle(formData: FormData) {
   const floorPrice = floorPriceStr ? parseFloat(floorPriceStr) : null;
   const description = (formData.get("description") as string)?.trim() || "";
 
+  // New Facebook/vehicle fields
+  const bodyStyle = (formData.get("body_style") as string)?.trim() || null;
+  const transmission = (formData.get("transmission") as string)?.trim() || null;
+  const fuelType = (formData.get("fuel_type") as string)?.trim() || null;
+  const vehicleCondition = (formData.get("vehicle_condition") as string)?.trim() || null;
+  const trimFromForm = (formData.get("trim") as string)?.trim() || null;
+  const latStr = formData.get("latitude") as string;
+  const lonStr = formData.get("longitude") as string;
+  const latitude = latStr && latStr.trim() ? parseFloat(latStr) : null;
+  const longitude = lonStr && lonStr.trim() ? parseFloat(lonStr) : null;
+
   // 4. Specs Logic: Auto-Decode if Manual Data is missing
-  let trim = "";
+  let trim = trimFromForm || "";
   let bodyClass = "";
 
   if ((!make || !model || !year) && vin) {
@@ -90,7 +101,7 @@ export async function addVehicle(formData: FormData) {
         if (!model) model = vinData.model;
         if (!year) year = vinData.year;
         
-        trim = vinData.trim || "";
+        trim = vinData.trim || trimFromForm || "";
         bodyClass = vinData.bodyClass || "";
 
         if (make === "Unknown") {
@@ -181,6 +192,9 @@ Condition/Notes: ${conditionNotes || "No additional notes provided."}`;
       description: finalDescription || undefined,
       trim: trim || undefined,
       bodyClass: bodyClass || undefined,
+      bodyStyle: bodyStyle || undefined,
+      transmission: transmission || undefined,
+      fuelType: fuelType || undefined,
       listedPrice,
       floorPrice: finalFloorPrice,
       vin: vin || undefined,
@@ -245,6 +259,14 @@ Condition/Notes: ${conditionNotes || "No additional notes provided."}`;
     condition_notes: conditionNotes,
     status: "Available",
     image_urls: imageUrls.length > 0 ? imageUrls : null,
+    body_style: bodyStyle || null,
+    transmission: transmission || null,
+    fuel_type: fuelType || null,
+    latitude: latitude ?? null,
+    longitude: longitude ?? null,
+    vehicle_condition: vehicleCondition || null,
+    trim: trim || null,
+    body_class: bodyClass || null,
   };
 
   // Add carfax_link if provided

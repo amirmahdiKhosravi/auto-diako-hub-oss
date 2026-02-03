@@ -70,6 +70,11 @@ export async function updateVehicle(vehicleId: string, formData: FormData) {
       : null;
 
   // 5. Extract Data
+  const latStr = formData.get("latitude") as string;
+  const lonStr = formData.get("longitude") as string;
+  const latitude = latStr && latStr.trim() ? parseFloat(latStr) : null;
+  const longitude = lonStr && lonStr.trim() ? parseFloat(lonStr) : null;
+
   const rawData = {
     vin: formData.get("vin") as string,
     make: formData.get("make") as string,
@@ -81,6 +86,14 @@ export async function updateVehicle(vehicleId: string, formData: FormData) {
     mileage: parseInt(formData.get("mileage") as string),
     condition_notes: formData.get("condition") as string,
     image_urls: allImages && allImages.length > 0 ? allImages : existingImages,
+    body_style: (formData.get("body_style") as string) || null,
+    transmission: (formData.get("transmission") as string) || null,
+    fuel_type: (formData.get("fuel_type") as string) || null,
+    latitude,
+    longitude,
+    vehicle_condition: (formData.get("vehicle_condition") as string) || null,
+    trim: (formData.get("trim") as string)?.trim() || null,
+    body_class: (formData.get("body_class") as string)?.trim() || null,
   };
 
   // 6. Update in Supabase

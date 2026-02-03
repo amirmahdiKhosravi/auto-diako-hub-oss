@@ -23,6 +23,14 @@ interface Vehicle {
   condition_notes: string;
   created_at: string;
   image_urls?: string[] | null;
+  body_style?: string | null;
+  transmission?: string | null;
+  fuel_type?: string | null;
+  vehicle_condition?: string | null;
+  trim?: string | null;
+  body_class?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 async function VehicleData({ id }: { id: string }) {
@@ -186,6 +194,51 @@ async function VehicleData({ id }: { id: string }) {
                       </p>
                     </div>
                   </div>
+                  {vehicle.body_style && (
+                    <div className="flex items-start gap-3">
+                      <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Body Style</p>
+                        <p className="font-semibold text-foreground">{vehicle.body_style}</p>
+                      </div>
+                    </div>
+                  )}
+                  {vehicle.transmission && (
+                    <div className="flex items-start gap-3">
+                      <Gauge className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Transmission</p>
+                        <p className="font-semibold text-foreground">{vehicle.transmission}</p>
+                      </div>
+                    </div>
+                  )}
+                  {vehicle.fuel_type && (
+                    <div className="flex items-start gap-3">
+                      <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Fuel Type</p>
+                        <p className="font-semibold text-foreground">{vehicle.fuel_type}</p>
+                      </div>
+                    </div>
+                  )}
+                  {vehicle.vehicle_condition && (
+                    <div className="flex items-start gap-3">
+                      <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Condition</p>
+                        <p className="font-semibold text-foreground">{vehicle.vehicle_condition}</p>
+                      </div>
+                    </div>
+                  )}
+                  {vehicle.trim && (
+                    <div className="flex items-start gap-3">
+                      <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Trim</p>
+                        <p className="font-semibold text-foreground">{vehicle.trim}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
