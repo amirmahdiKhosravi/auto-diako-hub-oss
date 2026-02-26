@@ -5,6 +5,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { generateVehicleEmbedding } from "@/lib/embeddings";
 import { createLLMProvider } from "@/lib/llm/factory";
+import {
+  VEHICLE_DESCRIPTION_SYSTEM_PROMPT,
+  buildVehicleDescriptionContext,
+} from "@/lib/vehicle-description-prompt";
 
 // VIN Decoding using NHTSA API
 async function decodeVIN(vin: string): Promise<{ make: string; model: string; year: number; trim: string; bodyClass: string } | null> {
@@ -128,38 +132,28 @@ export async function addVehicle(formData: FormData) {
   let finalDescription = description;
   if (!finalDescription) {
     try {
-      // Call LLM provider directly from server action (no need for HTTP request)
       const llmProvider = createLLMProvider();
-      
-      const systemMessage = `You are an expert car salesman writing a Facebook Marketplace listing.
-Write catchy, professional descriptions for vehicles.
-
-Rules:
-- Use bullet points for features
-- Use emojis to make it pop
-- Tone: Excited but trustworthy
-- Keep it under 150 words
-- Do NOT include a price (it's listed in a separate field)`;
-
-      let vehicleInfo = `Vehicle: ${year} ${make} ${model}`;
-      if (trim) {
-        vehicleInfo += ` ${trim}`;
-      }
-      if (bodyClass) {
-        vehicleInfo += `\nStyle: ${bodyClass}`;
-      }
-      
-      const userMessage = `Write a description for this vehicle:
-
-${vehicleInfo}
-Mileage: ${mileage} km
-Condition/Notes: ${conditionNotes || "No additional notes provided."}`;
+      const userMessage = `Write a description for this vehicle based on the following details:\n\n${buildVehicleDescriptionContext({
+        year,
+        make,
+        model,
+        mileage,
+        condition_notes: conditionNotes,
+        trim: trim || null,
+        body_class: bodyClass || null,
+        color: color || null,
+        body_style: bodyStyle || null,
+        transmission: transmission || null,
+        fuel_type: fuelType || null,
+        vehicle_condition: vehicleCondition || null,
+        vin: vin || null,
+      })}`;
 
       const result = await llmProvider.generateChatCompletion({
-        systemMessage,
+        systemMessage: VEHICLE_DESCRIPTION_SYSTEM_PROMPT,
         userMessage,
-        temperature: 0.7,
-        maxTokens: 300,
+        temperature: 0.5,
+        maxTokens: 8192,
       });
 
       if (result?.content && result.content.trim()) {
@@ -246,41 +240,41 @@ Condition/Notes: ${conditionNotes || "No additional notes provided."}`;
     }
   }
 
-  // 9. Prepare data for insertion
-  const rawData: Record<string, any> = {
-    vin: vin,
+  // 9. Prepare data for insertion (use null for empty optional strings)
+  const rawData: Record<string, unknown> = {
+    vin: vin || null,
     make,
     model,
     year,
     listed_price: listedPrice,
     floor_price: finalFloorPrice,
-    color,
+    color: color || "Unknown",
     mileage,
-    condition_notes: conditionNotes,
+    condition_notes: conditionNotes || "",
     status: "Available",
     image_urls: imageUrls.length > 0 ? imageUrls : null,
-    body_style: bodyStyle || null,
-    transmission: transmission || null,
-    fuel_type: fuelType || null,
+    body_style: bodyStyle?.trim() || null,
+    transmission: transmission?.trim() || null,
+    fuel_type: fuelType?.trim() || null,
     latitude: latitude ?? null,
     longitude: longitude ?? null,
-    vehicle_condition: vehicleCondition || null,
-    trim: trim || null,
-    body_class: bodyClass || null,
+    vehicle_condition: vehicleCondition?.trim() || null,
+    trim: trim?.trim() || null,
+    body_class: bodyClass?.trim() || null,
   };
 
   // Add carfax_link if provided
-  if (carfaxLink) {
-    rawData.carfax_link = carfaxLink;
+  if (carfaxLink?.trim()) {
+    rawData.carfax_link = carfaxLink.trim();
   }
 
   // Add description if available
-  if (finalDescription) {
-    rawData.description = finalDescription;
+  if (finalDescription?.trim()) {
+    rawData.description = finalDescription.trim();
   }
 
-  // Add embedding if generated successfully
-  if (vehicleEmbedding) {
+  // Add embedding if generated successfully (pgvector expects array format)
+  if (vehicleEmbedding && vehicleEmbedding.length > 0) {
     rawData.embedding = vehicleEmbedding;
   }
 
@@ -291,7 +285,9 @@ Condition/Notes: ${conditionNotes || "No additional notes provided."}`;
 
   if (error) {
     console.error("Database Error:", error);
-    throw new Error("Failed to save vehicle. Please try again.");
+    const message = error.message || "Unknown database error";
+    const hint = error.details ? ` (${error.details})` : "";
+    throw new Error(`Failed to save vehicle: ${message}${hint}`);
   }
 
   // 11. Success! Redirect to Dashboard

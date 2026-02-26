@@ -38,7 +38,7 @@ export class GeminiProvider implements LLMProviderInterface {
         model: this.chatModel,
         generationConfig: {
           temperature: config.temperature ?? 0.7,
-          maxOutputTokens: config.maxTokens ?? 300,
+          maxOutputTokens: config.maxTokens ?? 8192,
         },
       });
 

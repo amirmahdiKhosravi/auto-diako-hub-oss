@@ -3,6 +3,9 @@ import withPWA from "@ducanh2912/next-pwa";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  serverActions: {
+    bodySizeLimit: "10mb",
+  },
   images: {
     remotePatterns: [
       {

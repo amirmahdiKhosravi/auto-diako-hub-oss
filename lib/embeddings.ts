@@ -107,9 +107,15 @@ export async function generateVehicleEmbedding(
     // Get embedding model from environment or use default
     const embeddingModel = process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
 
+    // Request 1536 dimensions to match pgvector column. Only 3.x models support this param.
+    const supportsDimensions =
+      embeddingModel === "text-embedding-3-small" ||
+      embeddingModel === "text-embedding-3-large";
+
     const response = await openai.embeddings.create({
       model: embeddingModel,
       input: text,
+      ...(supportsDimensions && { dimensions: 1536 }),
     });
 
     const embedding = response.data[0]?.embedding;
@@ -118,9 +124,12 @@ export async function generateVehicleEmbedding(
       throw new Error("Failed to generate embedding from OpenAI");
     }
 
-    // Verify expected dimensions for OpenAI text-embedding-3-small (1536)
-    if (embedding.length !== 1536 && embeddingModel === "text-embedding-3-small") {
-      console.warn(`Unexpected embedding dimensions: ${embedding.length}, expected 1536`);
+    // Verify dimensions match DB expectation (pgvector column is 1536)
+    if (embedding.length !== 1536) {
+      throw new Error(
+        `Embedding dimensions mismatch: got ${embedding.length}, expected 1536. ` +
+          `Ensure OPENAI_EMBEDDING_MODEL is compatible (e.g. text-embedding-3-small or text-embedding-ada-002) and no dimensions override is set.`
+      );
     }
 
     return embedding;

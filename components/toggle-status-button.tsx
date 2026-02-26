@@ -19,7 +19,18 @@ export function ToggleStatusButton({ vehicleId, currentStatus }: ToggleStatusBut
     setIsToggling(true);
     try {
       await toggleStatus(vehicleId, currentStatus);
+      setIsToggling(false);
+      router.refresh();
     } catch (error) {
+      // Auth redirect: let it propagate
+      if (
+        error &&
+        typeof error === "object" &&
+        "digest" in error &&
+        String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
+      ) {
+        throw error;
+      }
       console.error("Error toggling status:", error);
       setIsToggling(false);
       alert("Failed to update status. Please try again.");
