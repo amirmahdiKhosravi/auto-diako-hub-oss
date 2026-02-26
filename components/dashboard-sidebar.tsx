@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
+import { RevAvenueLogo } from "@/components/rev-avenue-logo";
 
 const navigation = [
   { name: "Home", href: "/dashboard", icon: LayoutDashboard },
@@ -65,11 +66,11 @@ export function DashboardSidebar({ isMobile = false, onClose }: DashboardSidebar
     <>
       {/* Logo/Name */}
       <div className="flex items-center gap-3 px-6 py-6 border-b border-border">
-        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-600">
-          <span className="text-xl font-bold text-white">AD</span>
+        <div className="flex items-center justify-center w-20 h-12 rounded-lg bg-blue-600 shrink-0 overflow-hidden p-1.5">
+          <RevAvenueLogo width={120} height={36} className="object-contain w-full h-full" />
         </div>
-        <div>
-          <h1 className="text-lg font-bold text-foreground">Auto Diako Hub</h1>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-base font-bold text-foreground whitespace-nowrap" title="Rev Avenue Hub">Rev Avenue Hub</h1>
           <p className="text-xs text-muted-foreground">Dealership Manager</p>
         </div>
       </div>
@@ -128,7 +129,7 @@ export function DashboardSidebar({ isMobile = false, onClose }: DashboardSidebar
           onClick={onClose}
         />
         {/* Sidebar */}
-        <div className="fixed inset-y-0 left-0 w-64 bg-card border-r border-border flex flex-col">
+        <div className="fixed inset-y-0 left-0 w-72 bg-card border-r border-border flex flex-col">
           {sidebarContent}
         </div>
       </div>
@@ -136,7 +137,7 @@ export function DashboardSidebar({ isMobile = false, onClose }: DashboardSidebar
   }
 
   return (
-    <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 lg:border-r lg:border-border bg-card">
+    <div className="hidden lg:flex lg:flex-col lg:w-72 lg:fixed lg:inset-y-0 lg:border-r lg:border-border bg-card">
       {sidebarContent}
     </div>
   );

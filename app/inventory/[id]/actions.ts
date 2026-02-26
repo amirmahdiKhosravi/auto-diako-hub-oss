@@ -84,7 +84,9 @@ export async function updateVehicle(vehicleId: string, formData: FormData) {
     floor_price: parseFloat(formData.get("floor_price") as string),
     color: formData.get("color") as string,
     mileage: parseInt(formData.get("mileage") as string),
-    condition_notes: formData.get("condition") as string,
+    condition_notes: (formData.get("condition") as string) || "",
+    description: (formData.get("description") as string)?.trim() || null,
+    carfax_link: (formData.get("carfax_link") as string)?.trim() || null,
     image_urls: allImages && allImages.length > 0 ? allImages : existingImages,
     body_style: (formData.get("body_style") as string) || null,
     transmission: (formData.get("transmission") as string) || null,
@@ -129,7 +131,13 @@ export async function deleteVehicle(vehicleId: string) {
     .eq("id", vehicleId)
     .single();
 
-  // 3. Delete vehicle from database
+  // 3. Clear references from chat_sessions so the delete can succeed
+  await supabase
+    .from("chat_sessions")
+    .update({ active_car_id: null })
+    .eq("active_car_id", vehicleId);
+
+  // 4. Delete vehicle from database
   const { error } = await supabase
     .from("inventory")
     .delete()
@@ -140,13 +148,13 @@ export async function deleteVehicle(vehicleId: string) {
     redirect(`/inventory/${vehicleId}?error=Delete Failed`);
   }
 
-  // 4. Optionally delete images from storage (commented out for safety)
+  // 5. Optionally delete images from storage (commented out for safety)
   // If you want to delete images, uncomment and implement:
   // if (vehicle?.image_urls) {
   //   // Extract file paths from URLs and delete from storage
   // }
 
-  // 5. Success! Revalidate and redirect
+  // 6. Success! Revalidate and redirect
   revalidatePath("/dashboard");
   redirect("/dashboard");
 }
@@ -174,9 +182,9 @@ export async function toggleStatus(vehicleId: string, currentStatus: string) {
     redirect(`/inventory/${vehicleId}?error=Status Update Failed`);
   }
 
-  // 4. Success! Revalidate and redirect
+  // 4. Success! Revalidate and return so client can refresh
   revalidatePath("/dashboard");
   revalidatePath(`/inventory/${vehicleId}`);
-  redirect(`/inventory/${vehicleId}`);
+  return { success: true, newStatus };
 }
 

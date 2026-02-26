@@ -44,7 +44,7 @@ export class OpenAIProvider implements LLMProviderInterface {
         model: this.chatModel,
         messages,
         temperature: config.temperature ?? 0.7,
-        max_tokens: config.maxTokens ?? 300,
+        max_tokens: config.maxTokens ?? 8192,
       });
 
       const content = completion.choices[0]?.message?.content;

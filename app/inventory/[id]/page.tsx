@@ -3,7 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Calendar, Gauge, Hash, Palette, FileText } from "lucide-react";
+import { ArrowLeft, FileText, MapPin, ExternalLink, Calendar, Gauge, Hash, Palette } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,6 +31,8 @@ interface Vehicle {
   body_class?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  description?: string | null;
+  carfax_link?: string | null;
 }
 
 async function VehicleData({ id }: { id: string }) {
@@ -203,6 +205,15 @@ async function VehicleData({ id }: { id: string }) {
                       </div>
                     </div>
                   )}
+                  {vehicle.body_class && (
+                    <div className="flex items-start gap-3">
+                      <FileText className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Body Class</p>
+                        <p className="font-semibold text-foreground">{vehicle.body_class}</p>
+                      </div>
+                    </div>
+                  )}
                   {vehicle.transmission && (
                     <div className="flex items-start gap-3">
                       <Gauge className="w-5 h-5 text-muted-foreground mt-0.5" />
@@ -243,6 +254,18 @@ async function VehicleData({ id }: { id: string }) {
               </CardContent>
             </Card>
 
+            {/* Description */}
+            {vehicle.description && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Description</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-foreground whitespace-pre-wrap">{vehicle.description}</p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Condition Notes */}
             {vehicle.condition_notes && (
               <Card>
@@ -272,10 +295,38 @@ async function VehicleData({ id }: { id: string }) {
                       })}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Vehicle ID</span>
-                    <span className="text-foreground font-mono text-xs">{vehicle.id}</span>
-                  </div>
+                  {vehicle.carfax_link && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Carfax Report</span>
+                      <a
+                        href={vehicle.carfax_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-foreground underline-offset-4 hover:underline inline-flex items-center gap-1"
+                      >
+                        View report
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  )}
+                  {(vehicle.latitude != null || vehicle.longitude != null) && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Location</span>
+                      <span className="text-foreground">
+                        {[vehicle.latitude, vehicle.longitude].filter((n) => n != null).join(", ")}
+                        {" · "}
+                        <a
+                          href={`https://www.google.com/maps?q=${vehicle.latitude ?? ""},${vehicle.longitude ?? ""}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline-offset-4 hover:underline inline-flex items-center gap-1"
+                        >
+                          View on map
+                          <MapPin className="w-3.5 h-3.5 inline" />
+                        </a>
+                      </span>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

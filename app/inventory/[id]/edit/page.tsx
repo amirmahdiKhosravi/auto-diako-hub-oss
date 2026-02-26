@@ -169,7 +169,7 @@ async function EditVehicleForm({ paramsPromise }: { paramsPromise: Promise<{ id:
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="body_style">Body Style</Label>
-                  <select id="body_style" name="body_style" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm" defaultValue={vehicle.body_style || ""}>
+                  <select id="body_style" name="body_style" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm" defaultValue={vehicle.body_style || ""}>
                     <option value="">Select...</option>
                     <option value="SEDAN">Sedan</option>
                     <option value="SUV">SUV</option>
@@ -186,7 +186,7 @@ async function EditVehicleForm({ paramsPromise }: { paramsPromise: Promise<{ id:
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="transmission">Transmission</Label>
-                  <select id="transmission" name="transmission" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm" defaultValue={vehicle.transmission || ""}>
+                  <select id="transmission" name="transmission" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm" defaultValue={vehicle.transmission || ""}>
                     <option value="">Select...</option>
                     <option value="Automatic">Automatic</option>
                     <option value="Manual">Manual</option>
@@ -197,7 +197,7 @@ async function EditVehicleForm({ paramsPromise }: { paramsPromise: Promise<{ id:
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="fuel_type">Fuel Type</Label>
-                  <select id="fuel_type" name="fuel_type" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm" defaultValue={vehicle.fuel_type || ""}>
+                  <select id="fuel_type" name="fuel_type" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm" defaultValue={vehicle.fuel_type || ""}>
                     <option value="">Select...</option>
                     <option value="Gasoline">Gasoline</option>
                     <option value="Diesel">Diesel</option>
@@ -208,7 +208,7 @@ async function EditVehicleForm({ paramsPromise }: { paramsPromise: Promise<{ id:
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="vehicle_condition">Condition</Label>
-                  <select id="vehicle_condition" name="vehicle_condition" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm" defaultValue={vehicle.vehicle_condition || ""}>
+                  <select id="vehicle_condition" name="vehicle_condition" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm" defaultValue={vehicle.vehicle_condition || ""}>
                     <option value="">Select...</option>
                     <option value="EXCELLENT">Excellent</option>
                     <option value="GOOD">Good</option>
@@ -253,20 +253,49 @@ async function EditVehicleForm({ paramsPromise }: { paramsPromise: Promise<{ id:
                 />
               </div>
 
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="description">Listing Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  placeholder="Full listing description shown to buyers. Leave empty to hide."
+                  className="min-h-40 resize-y"
+                  defaultValue={vehicle.description || ""}
+                />
+                <p className="text-xs text-muted-foreground">
+                  This is the main description shown on the vehicle listing. The AI uses it for chat; you can edit it here.
+                </p>
+              </div>
+
+              {/* Carfax Link */}
+              <div className="space-y-2">
+                <Label htmlFor="carfax_link">Carfax Link (Optional)</Label>
+                <Input
+                  id="carfax_link"
+                  name="carfax_link"
+                  type="url"
+                  placeholder="https://vhr.carfax.ca/..."
+                  defaultValue={vehicle.carfax_link || ""}
+                />
+              </div>
+
               {/* Vehicle Images */}
               <div className="space-y-2">
                 <Label htmlFor="images">Add Additional Vehicle Images</Label>
-                <Input
-                  id="images"
-                  name="images"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  className="cursor-pointer"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Select new images to add to existing ones. Existing images will be preserved.
-                </p>
+                <div className="border-2 border-dashed border-border rounded-lg p-4 hover:bg-muted/50 transition">
+                  <Input
+                    id="images"
+                    name="images"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="cursor-pointer bg-background text-foreground file:text-foreground"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Select new images to add to existing ones. Existing images will be preserved.
+                  </p>
+                </div>
               </div>
 
               <Button type="submit" className="w-full">

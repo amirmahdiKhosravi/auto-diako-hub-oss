@@ -65,4 +65,13 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Native select dropdown options: use theme colors so options are visible in dark mode */
+  select option {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+  /* File input: ensure "No file chosen" and filename use theme text color */
+  input[type="file"] {
+    color: hsl(var(--foreground));
+  }
 }

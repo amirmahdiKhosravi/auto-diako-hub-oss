@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createLLMProvider } from "@/lib/llm/factory";
+import {
+  VEHICLE_DESCRIPTION_SYSTEM_PROMPT,
+  buildVehicleDescriptionContext,
+} from "@/lib/vehicle-description-prompt";
 
 // Type definitions
 interface GenerateDescriptionRequest {
@@ -11,6 +15,11 @@ interface GenerateDescriptionRequest {
   condition: string;
   trim?: string;
   bodyClass?: string;
+  color?: string;
+  body_style?: string;
+  transmission?: string;
+  fuel_type?: string;
+  vehicle_condition?: string;
 }
 
 interface GenerateDescriptionResponse {
@@ -28,7 +37,7 @@ function validateRequest(body: unknown): body is GenerateDescriptionRequest {
   }
 
   const req = body as Record<string, unknown>;
-  return (
+  const base =
     typeof req.make === "string" &&
     req.make.trim().length > 0 &&
     typeof req.model === "string" &&
@@ -39,10 +48,17 @@ function validateRequest(body: unknown): body is GenerateDescriptionRequest {
     typeof req.mileage === "number" &&
     req.mileage >= 0 &&
     typeof req.condition === "string" &&
-    req.condition.trim().length > 0 &&
     (req.trim === undefined || typeof req.trim === "string") &&
-    (req.bodyClass === undefined || typeof req.bodyClass === "string")
-  );
+    (req.bodyClass === undefined || typeof req.bodyClass === "string");
+
+  const optionals =
+    (req.color === undefined || typeof req.color === "string") &&
+    (req.body_style === undefined || typeof req.body_style === "string") &&
+    (req.transmission === undefined || typeof req.transmission === "string") &&
+    (req.fuel_type === undefined || typeof req.fuel_type === "string") &&
+    (req.vehicle_condition === undefined || typeof req.vehicle_condition === "string");
+
+  return base && optionals;
 }
 
 export async function POST(req: Request) {
@@ -80,7 +96,20 @@ export async function POST(req: Request) {
       );
     }
 
-    const { make, model, year, mileage, condition, trim, bodyClass } = body;
+    const {
+      make,
+      model,
+      year,
+      mileage,
+      condition,
+      trim,
+      bodyClass,
+      color,
+      body_style,
+      transmission,
+      fuel_type,
+      vehicle_condition,
+    } = body;
 
     // 3. Initialize LLM provider
     let llmProvider;
@@ -99,29 +128,20 @@ export async function POST(req: Request) {
     }
 
     // 4. Construct the prompt with proper message structure
-    const systemMessage = `You are an expert car salesman writing a Facebook Marketplace listing.
-Write catchy, professional descriptions for vehicles.
-
-Rules:
-- Use bullet points for features
-- Use emojis to make it pop
-- Tone: Excited but trustworthy
-- Keep it under 150 words
-- Do NOT include a price (it's listed in a separate field)`;
-
-    let vehicleInfo = `Vehicle: ${year} ${make} ${model}`;
-    if (trim) {
-      vehicleInfo += ` ${trim}`;
-    }
-    if (bodyClass) {
-      vehicleInfo += `\nStyle: ${bodyClass}`;
-    }
-    
-    const userMessage = `Write a description for this vehicle:
-
-${vehicleInfo}
-Mileage: ${mileage} km
-Condition/Notes: ${condition}`;
+    const userMessage = `Write a description for this vehicle based on the following details:\n\n${buildVehicleDescriptionContext({
+      year,
+      make,
+      model,
+      mileage,
+      condition_notes: condition,
+      trim: trim?.trim() || null,
+      body_class: bodyClass?.trim() || null,
+      color: color?.trim() || null,
+      body_style: body_style?.trim() || null,
+      transmission: transmission?.trim() || null,
+      fuel_type: fuel_type?.trim() || null,
+      vehicle_condition: vehicle_condition?.trim() || null,
+    })}`;
 
     // 5. Generate description using LLM provider
     let result;
@@ -129,10 +149,10 @@ Condition/Notes: ${condition}`;
       console.log("[API] Calling LLM generateChatCompletion...");
       console.log("[API] User message length:", userMessage.length);
       result = await llmProvider.generateChatCompletion({
-        systemMessage,
+        systemMessage: VEHICLE_DESCRIPTION_SYSTEM_PROMPT,
         userMessage,
-        temperature: 0.7,
-        maxTokens: 300,
+        temperature: 0.5,
+        maxTokens: 8192,
       });
       console.log("[API] LLM generation successful, content length:", result?.content?.length || 0);
     } catch (error) {

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/password-input";
 import { Suspense } from "react";
 import Link from "next/link";
-import { Car } from "lucide-react";
+import { RevAvenueLogo } from "@/components/rev-avenue-logo";
 
 /**
  * ErrorDisplay Component
@@ -65,11 +65,10 @@ export default function LoginPage({
       {/* Right Side - Login Form */}
       <div className="w-full md:w-[55%] flex items-center justify-center bg-gray-50 dark:bg-gray-50 p-6 md:p-12">
         <div className="w-full max-w-md">
-          {/* Logo placeholder */}
+          {/* Logo - dark container so white logo is visible on light background */}
           <div className="flex items-center justify-center mb-8">
-            <div className="flex items-center gap-2">
-              <Car className="h-8 w-8 text-gray-900" />
-              <span className="text-2xl font-bold text-gray-900">Auto Diako</span>
+            <div className="flex items-center justify-center rounded-lg bg-gray-900 px-6 py-3">
+              <RevAvenueLogo width={160} height={44} priority />
             </div>
           </div>
 
@@ -83,7 +82,7 @@ export default function LoginPage({
                 name="email" 
                 type="email" 
                 required 
-                placeholder="admin@autodiako.com"
+                placeholder="admin@revavenue.com"
                 className="bg-white text-gray-900 dark:text-gray-900"
               />
             </div>

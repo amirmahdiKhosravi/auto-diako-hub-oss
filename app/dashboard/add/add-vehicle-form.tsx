@@ -21,6 +21,15 @@ export default function AddVehicleForm() {
     try {
       await addVehicle(formData);
     } catch (error) {
+      // Next.js redirect() throws; rethrow so we don't show error when add succeeded
+      if (
+        error &&
+        typeof error === "object" &&
+        "digest" in error &&
+        String((error as { digest?: string }).digest).startsWith("NEXT_REDIRECT")
+      ) {
+        throw error;
+      }
       console.error(error);
       setIsSubmitting(false);
       alert("Something went wrong. Please try again.");
@@ -41,7 +50,7 @@ export default function AddVehicleForm() {
           </p>
           
           {/* Form Type Selector */}
-          <div className="flex gap-2 border-b border-gray-200 pb-4">
+          <div className="flex gap-2 border-b border-border pb-4">
             <Button
               type="button"
               variant={formType === "manual" ? "default" : "outline"}
@@ -70,37 +79,37 @@ export default function AddVehicleForm() {
                   <Input id="vin" name="vin" placeholder="1HGCM..." maxLength={17} className="font-mono uppercase" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="year">Year</Label>
+                  <Label htmlFor="year">Year *</Label>
                   <Input id="year" name="year" type="number" required placeholder="2018" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="make">Make</Label>
+                  <Label htmlFor="make">Make *</Label>
                   <Input id="make" name="make" required placeholder="Honda" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="model">Model</Label>
+                  <Label htmlFor="model">Model *</Label>
                   <Input id="model" name="model" required placeholder="Civic" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="color">Color</Label>
+                  <Label htmlFor="color">Color *</Label>
                   <Input id="color" name="color" required placeholder="Black" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="mileage">Mileage (km)</Label>
+                  <Label htmlFor="mileage">Mileage (km) *</Label>
                   <Input id="mileage" name="mileage" type="number" required placeholder="50000" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="body_style">Body Style</Label>
-                  <select id="body_style" name="body_style" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                  <Label htmlFor="body_style">Body Style (Optional)</Label>
+                  <select id="body_style" name="body_style" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
                     <option value="">Select...</option>
                     <option value="SEDAN">Sedan</option>
                     <option value="SUV">SUV</option>
@@ -116,8 +125,8 @@ export default function AddVehicleForm() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="transmission">Transmission</Label>
-                  <select id="transmission" name="transmission" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                  <Label htmlFor="transmission">Transmission (Optional)</Label>
+                  <select id="transmission" name="transmission" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
                     <option value="">Select...</option>
                     <option value="Automatic">Automatic</option>
                     <option value="Manual">Manual</option>
@@ -127,8 +136,8 @@ export default function AddVehicleForm() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fuel_type">Fuel Type</Label>
-                  <select id="fuel_type" name="fuel_type" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                  <Label htmlFor="fuel_type">Fuel Type (Optional)</Label>
+                  <select id="fuel_type" name="fuel_type" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
                     <option value="">Select...</option>
                     <option value="Gasoline">Gasoline</option>
                     <option value="Diesel">Diesel</option>
@@ -138,8 +147,8 @@ export default function AddVehicleForm() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="vehicle_condition">Condition</Label>
-                  <select id="vehicle_condition" name="vehicle_condition" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                  <Label htmlFor="vehicle_condition">Condition (Optional)</Label>
+                  <select id="vehicle_condition" name="vehicle_condition" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
                     <option value="">Select...</option>
                     <option value="EXCELLENT">Excellent</option>
                     <option value="GOOD">Good</option>
@@ -170,11 +179,11 @@ export default function AddVehicleForm() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border border-border">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Listed Price ($)</Label>
+                  <Label htmlFor="price">Listed Price ($) *</Label>
                   <Input id="price" name="price" type="number" required placeholder="15000" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="floor_price" className="text-destructive">Floor Price (Hidden Minimum)</Label>
+                  <Label htmlFor="floor_price" className="text-destructive">Floor Price (Hidden Minimum) *</Label>
                   <Input id="floor_price" name="floor_price" type="number" required placeholder="13500" />
                   <p className="text-xs text-muted-foreground">The AI will never negotiate below this.</p>
                 </div>
@@ -186,15 +195,15 @@ export default function AddVehicleForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="images">Vehicle Photos</Label>
-                <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
-                  <Input id="images" name="images" type="file" multiple accept="image/*" required className="cursor-pointer" />
-                  <p className="text-xs text-gray-400 mt-2 text-center">Upload main angles (Front, Back, Interior)</p>
+                <Label htmlFor="images">Vehicle Photos *</Label>
+                <div className="border-2 border-dashed border-border rounded-lg p-4 hover:bg-muted/50 transition">
+                  <Input id="images" name="images" type="file" multiple accept="image/*" required className="cursor-pointer bg-background text-foreground file:text-foreground" />
+                  <p className="text-xs text-muted-foreground mt-2 text-center">Upload main angles (Front, Back, Interior)</p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="condition">Condition & Features</Label>
+                <Label htmlFor="condition">Condition & Features (Optional)</Label>
                 <Textarea 
                   id="condition" 
                   name="condition" 
@@ -231,7 +240,7 @@ export default function AddVehicleForm() {
               {/* VIN Form */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="vin">VIN (Vehicle Identification Number)</Label>
+                  <Label htmlFor="vin">VIN *</Label>
                   <Input 
                     id="vin" name="vin" 
                     required 
@@ -241,14 +250,14 @@ export default function AddVehicleForm() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="mileage">Mileage (km)</Label>
+                  <Label htmlFor="mileage">Mileage (km) *</Label>
                   <Input id="mileage" name="mileage" type="number" required placeholder="125000" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="price">Listed Price ($)</Label>
+                  <Label htmlFor="price">Listed Price ($) *</Label>
                   <Input id="price" name="price" type="number" required placeholder="15000" />
                 </div>
                 <div className="space-y-2">
@@ -259,8 +268,8 @@ export default function AddVehicleForm() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="body_style">Body Style</Label>
-                  <select id="body_style" name="body_style" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                  <Label htmlFor="body_style">Body Style (Optional)</Label>
+                  <select id="body_style" name="body_style" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
                     <option value="">Select...</option>
                     <option value="SEDAN">Sedan</option>
                     <option value="SUV">SUV</option>
@@ -276,8 +285,8 @@ export default function AddVehicleForm() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="transmission">Transmission</Label>
-                  <select id="transmission" name="transmission" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                  <Label htmlFor="transmission">Transmission (Optional)</Label>
+                  <select id="transmission" name="transmission" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
                     <option value="">Select...</option>
                     <option value="Automatic">Automatic</option>
                     <option value="Manual">Manual</option>
@@ -287,8 +296,8 @@ export default function AddVehicleForm() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fuel_type">Fuel Type</Label>
-                  <select id="fuel_type" name="fuel_type" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                  <Label htmlFor="fuel_type">Fuel Type (Optional)</Label>
+                  <select id="fuel_type" name="fuel_type" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
                     <option value="">Select...</option>
                     <option value="Gasoline">Gasoline</option>
                     <option value="Diesel">Diesel</option>
@@ -298,8 +307,8 @@ export default function AddVehicleForm() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="vehicle_condition">Condition</Label>
-                  <select id="vehicle_condition" name="vehicle_condition" className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm">
+                  <Label htmlFor="vehicle_condition">Condition (Optional)</Label>
+                  <select id="vehicle_condition" name="vehicle_condition" className="flex h-9 w-full rounded-md border border-input bg-background text-foreground px-3 py-1 text-base shadow-sm md:text-sm">
                     <option value="">Select...</option>
                     <option value="EXCELLENT">Excellent</option>
                     <option value="GOOD">Good</option>
@@ -327,15 +336,15 @@ export default function AddVehicleForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="images">Vehicle Photos</Label>
-                <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition">
-                  <Input id="images" name="images" type="file" multiple accept="image/*" required className="cursor-pointer" />
-                  <p className="text-xs text-gray-400 mt-2 text-center">Upload main angles (Front, Back, Interior)</p>
+                <Label htmlFor="images">Vehicle Photos *</Label>
+                <div className="border-2 border-dashed border-border rounded-lg p-4 hover:bg-muted/50 transition">
+                  <Input id="images" name="images" type="file" multiple accept="image/*" required className="cursor-pointer bg-background text-foreground file:text-foreground" />
+                  <p className="text-xs text-muted-foreground mt-2 text-center">Upload main angles (Front, Back, Interior)</p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="condition">Condition & Extra Features</Label>
+                <Label htmlFor="condition">Condition & Extra Features (Optional)</Label>
                 <Textarea 
                   id="condition" 
                   name="condition" 
