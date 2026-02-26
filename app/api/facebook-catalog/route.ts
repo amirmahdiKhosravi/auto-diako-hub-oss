@@ -54,7 +54,7 @@ export async function GET() {
   // 2. Start building XML - Facebook Automotive Feed Format
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <listings>
-  <title>Auto Diako Inventory</title>
+  <title>Rev Avenue Inventory</title>
   <link rel="self" href="${baseUrl}/api/facebook-catalog"/>
 `;
 
