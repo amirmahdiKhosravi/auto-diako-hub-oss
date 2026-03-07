@@ -1,4 +1,25 @@
 {
+  "name": "auto-diako-hub",
+  "description": "AI-powered dealership inventory management platform with LLM-generated vehicle descriptions, vector search, and Facebook Automotive Catalog integration",
+  "keywords": [
+    "nextjs",
+    "react",
+    "typescript",
+    "supabase",
+    "openai",
+    "google-gemini",
+    "tailwindcss",
+    "shadcn-ui",
+    "dealer-management",
+    "inventory-management",
+    "ai",
+    "llm",
+    "vehicle-inventory",
+    "automotive",
+    "facebook-catalog",
+    "pgvector",
+    "pwa"
+  ],
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",

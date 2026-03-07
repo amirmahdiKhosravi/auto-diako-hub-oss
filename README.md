@@ -1,131 +1,162 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# Auto Diako Hub
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
-
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+**Auto Diako Hub** is an AI-powered dealership inventory management platform built with Next.js and Supabase. It enables automotive dealerships to manage their vehicle inventory, generate professional AI-written listings, and sync inventory to Facebook Automotive Catalog—all from a single dashboard.
 
 ## Features
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Proxy
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+- **Vehicle Inventory Management** — Add, edit, and track vehicles with full details (make, model, year, mileage, trim, color, transmission, fuel type, condition, VIN, pricing)
+- **AI-Powered Descriptions** — Generate professional vehicle listing descriptions using [OpenAI](https://openai.com/) (`gpt-4o`) or [Google Gemini](https://deepmind.google/technologies/gemini/) (`gemini-2.5-flash`)
+- **Vector Search with pgvector** — Embed vehicle data as semantic vectors stored in Supabase for intelligent search and matching
+- **Facebook Automotive Catalog** — Automatically generate an XML feed to sync available inventory with Facebook Automotive Marketplace
+- **Authentication** — Secure, cookie-based auth with email/password login, sign-up, password reset, and protected routes via Supabase SSR
+- **Progressive Web App (PWA)** — Installable on desktop and mobile with offline capability
+- **Dark / Light Theme** — Full theme support via `next-themes`
+- **Responsive Dashboard** — Clean sidebar navigation with inventory overview, analytics, leads, and settings pages
 
-## Demo
+## Tech Stack
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+| Layer | Technology |
+|---|---|
+| Framework | [Next.js](https://nextjs.org) (App Router) |
+| Language | [TypeScript](https://www.typescriptlang.org/) |
+| Database & Auth | [Supabase](https://supabase.com/) (PostgreSQL + pgvector) |
+| AI / LLM | [OpenAI SDK](https://github.com/openai/openai-node) · [Google Generative AI](https://github.com/google-gemini/generative-ai-js) |
+| Styling | [Tailwind CSS](https://tailwindcss.com) · [shadcn/ui](https://ui.shadcn.com/) · [Radix UI](https://www.radix-ui.com/) |
+| PWA | [@ducanh2912/next-pwa](https://github.com/DuCanhGH/next-pwa) |
+| Icons | [Lucide React](https://lucide.dev/) |
 
-## Deploy to Vercel
+## Getting Started
 
-Vercel deployment will guide you through creating a Supabase account and project.
+### Prerequisites
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+- Node.js 18+
+- A [Supabase](https://supabase.com/) project
+- An [OpenAI](https://platform.openai.com/) API key and/or a [Google Gemini](https://makersuite.google.com/app/apikey) API key
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+### 1. Clone the repository
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+```bash
+git clone https://github.com/amirmahdiKhosravi/auto-diako-hub.git
+cd auto-diako-hub
+```
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+### 2. Install dependencies
 
-## Clone and run locally
+```bash
+npm install
+```
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+### 3. Configure environment variables
 
-2. Create a Next.js app using the Supabase Starter template npx command
+Copy `.env.example` to `.env.local` and fill in your values:
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_or_anon_key
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+# LLM Provider — choose "openai" or "gemini"
+LLM_PROVIDER=openai
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+# OpenAI (required when LLM_PROVIDER=openai)
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o                          # optional
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small # optional
 
-3. Use `cd` to change into the app's directory
+# Google Gemini (required when LLM_PROVIDER=gemini)
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash                # optional
 
-   ```bash
-   cd with-supabase-app
-   ```
+# Facebook Catalog
+NEXT_PUBLIC_BASE_URL=https://yourdomain.com
+NEXT_PUBLIC_DEALER_STREET_ADDRESS=123 Main St, Mississauga, ON
+```
 
-4. Rename `.env.example` to `.env.local` and update the following:
+> [!NOTE]
+> `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` accepts both the new **publishable** key and the legacy **anon** key. See the [Supabase announcement](https://github.com/orgs/supabase/discussions/29260) for details.
+>
+> LLM API keys are server-side only (no `NEXT_PUBLIC_` prefix) to keep them secure.
 
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[INSERT SUPABASE PROJECT API PUBLISHABLE OR ANON KEY]
-  ```
-  > [!NOTE]
-  > This example uses `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, which refers to Supabase's new **publishable** key format.
-  > Both legacy **anon** keys and new **publishable** keys can be used with this variable name during the transition period. Supabase's dashboard may show `NEXT_PUBLIC_SUPABASE_ANON_KEY`; its value can be used in this example.
-  > See the [full announcement](https://github.com/orgs/supabase/discussions/29260) for more information.
+### 4. Run the development server
 
-  Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+```bash
+npm run dev
+```
 
-  For the vehicle description generation and embedding features, also add:
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-  ```env
-  # LLM Provider Configuration
-  LLM_PROVIDER=openai  # or "gemini" to use Google Gemini
+### 5. Build for production
 
-  # OpenAI Configuration (required when using OpenAI)
-  OPENAI_API_KEY=[INSERT YOUR OPENAI API KEY]
-  OPENAI_MODEL=gpt-4o  # Optional, defaults to gpt-4o
-  OPENAI_EMBEDDING_MODEL=text-embedding-3-small  # Optional, defaults to text-embedding-3-small
+```bash
+npm run build
+npm start
+```
 
-  # Gemini Configuration (required when using Gemini)
-  GEMINI_API_KEY=[INSERT YOUR GEMINI API KEY]
-  GEMINI_MODEL=gemini-pro  # Optional, defaults to gemini-pro
-  GEMINI_EMBEDDING_MODEL=gemini-embedding-001  # Optional, defaults to gemini-embedding-001
-  ```
-  > [!NOTE]
-  > - The API keys are server-side only environment variables (no `NEXT_PUBLIC_` prefix) to keep them secure.
-  > - You can switch between providers by changing `LLM_PROVIDER` to `"openai"` or `"gemini"`.
-  > - Get your OpenAI API key from [OpenAI's API keys page](https://platform.openai.com/api-keys).
-  > - Get your Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey).
+## Project Structure
 
-5. You can now run the Next.js local development server:
+```
+auto-diako-hub/
+├── app/
+│   ├── api/
+│   │   ├── generate-description/   # AI description generation endpoint
+│   │   └── facebook-catalog/       # Facebook XML feed endpoint
+│   ├── auth/                       # Login, sign-up, password reset pages
+│   ├── dashboard/                  # Main dashboard & sub-pages
+│   │   ├── add/                   # Add vehicle form
+│   │   ├── inventory/[id]/        # Vehicle detail & edit
+│   │   ├── ai-config/             # AI provider settings
+│   │   ├── analytics/             # Analytics (coming soon)
+│   │   ├── leads/                 # Lead management (coming soon)
+│   │   └── settings/              # Dealership settings
+│   ├── layout.tsx
+│   └── page.tsx                   # Redirects to login
+├── components/                     # Reusable React components
+│   ├── ui/                        # shadcn/ui base components
+│   └── ...                        # Auth, dashboard, vehicle components
+├── lib/
+│   ├── llm/
+│   │   ├── factory.ts             # LLM provider factory
+│   │   ├── types.ts               # Shared LLM interfaces
+│   │   └── providers/             # OpenAI & Gemini implementations
+│   ├── supabase/                  # Supabase client helpers (server, client, proxy)
+│   ├── embeddings.ts              # Vehicle vector embedding generation
+│   ├── vehicle-description-prompt.ts
+│   └── utils.ts
+├── supabase/
+│   └── migrations/                # Database migration files
+└── public/                        # Static assets
+```
 
-   ```bash
-   npm run dev
-   ```
+## API Endpoints
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+### `POST /api/generate-description`
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+Generates a professional vehicle listing description using the configured LLM provider.
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+**Request body:**
+```json
+{
+  "make": "Toyota",
+  "model": "Camry",
+  "year": 2022,
+  "mileage": 35000,
+  "trim": "XSE",
+  "color": "Midnight Black",
+  "transmission": "Automatic",
+  "fuelType": "Gasoline",
+  "condition": "Used"
+}
+```
 
-## Feedback and issues
+**Response:**
+```json
+{ "description": "Discover the 2022 Toyota Camry XSE..." }
+```
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+### `GET /api/facebook-catalog`
 
-## More Supabase examples
+Returns an RSS/XML feed of all available inventory formatted for Facebook Automotive Catalog import. Cached for 1 hour.
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+## License
+
+This project is private. All rights reserved.
