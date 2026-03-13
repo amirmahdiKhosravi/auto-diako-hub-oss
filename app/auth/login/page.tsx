@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/password-input";
 import { Suspense } from "react";
 import Link from "next/link";
-import { RevAvenueLogo } from "@/components/rev-avenue-logo";
+import { AppLogo } from "@/components/app-logo";
 
 /**
  * ErrorDisplay Component
@@ -68,7 +68,7 @@ export default function LoginPage({
           {/* Logo - dark container so white logo is visible on light background */}
           <div className="flex items-center justify-center mb-8">
             <div className="flex items-center justify-center rounded-lg bg-gray-900 px-6 py-3">
-              <RevAvenueLogo width={160} height={44} priority />
+              <AppLogo width={160} height={44} priority />
             </div>
           </div>
 
@@ -82,7 +82,7 @@ export default function LoginPage({
                 name="email" 
                 type="email" 
                 required 
-                placeholder="admin@revavenue.com"
+                placeholder="you@example.com"
                 className="bg-white text-gray-900 dark:text-gray-900"
               />
             </div>

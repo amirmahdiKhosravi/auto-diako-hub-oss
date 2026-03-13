@@ -11,11 +11,6 @@ import { GeminiProvider } from "./providers/gemini";
 export function createLLMProvider(): LLMProviderInterface {
   const provider = (process.env.LLM_PROVIDER || "openai").toLowerCase() as LLMProvider;
 
-  // Debug logging (without exposing sensitive data)
-  console.log(`[LLM Factory] Creating provider: ${provider}`);
-  console.log(`[LLM Factory] OPENAI_API_KEY present: ${!!process.env.OPENAI_API_KEY}`);
-  console.log(`[LLM Factory] GEMINI_API_KEY present: ${!!process.env.GEMINI_API_KEY}`);
-
   switch (provider) {
     case "openai":
       return new OpenAIProvider();

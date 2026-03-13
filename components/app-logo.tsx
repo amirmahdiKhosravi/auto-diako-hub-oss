@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-interface RevAvenueLogoProps {
+interface AppLogoProps {
   className?: string;
   width?: number;
   height?: number;
@@ -8,18 +8,19 @@ interface RevAvenueLogoProps {
 }
 
 /**
- * Rev Avenue logo (white on transparent). Use on dark backgrounds or inside a dark container for visibility.
+ * Application logo (white on transparent). Use on dark backgrounds or inside a dark container for visibility.
+ * Replace /app-logo.png in the public/ directory with your own branding.
  */
-export function RevAvenueLogo({
+export function AppLogo({
   className,
   width = 140,
   height = 40,
   priority = false,
-}: RevAvenueLogoProps) {
+}: AppLogoProps) {
   return (
     <Image
-      src="/rev-avenue-logo.png"
-      alt="Rev Avenue"
+      src="/app-logo.png"
+      alt="Auto Diako Hub"
       width={width}
       height={height}
       className={className}

@@ -9,13 +9,13 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Rev Avenue Hub",
-  description: "The Central Inventory Hub - Manage inventory, monitor AI Sales Agent performance, and close deals in one place.",
+  title: "Auto Diako Hub",
+  description: "AI-powered dealership inventory management — manage inventory, generate descriptions, and sync to marketplaces.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Rev Avenue Hub",
+    title: "Auto Diako Hub",
   },
   icons: {
     icon: [

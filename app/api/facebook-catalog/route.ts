@@ -54,7 +54,7 @@ export async function GET() {
   // 2. Start building XML - Facebook Automotive Feed Format
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <listings>
-  <title>Rev Avenue Inventory</title>
+  <title>Vehicle Inventory</title>
   <link rel="self" href="${baseUrl}/api/facebook-catalog"/>
 `;
 
@@ -107,15 +107,20 @@ export async function GET() {
           <unit>KM</unit>
         </mileage>`;
 
-    // Address: Facebook nested format - use lat/long if available, else hardcoded Mississauga
-    const lat = car.latitude ?? 43.589;
-    const lon = car.longitude ?? -79.644;
+    const defaultLat = process.env.NEXT_PUBLIC_DEFAULT_LATITUDE || "0";
+    const defaultLon = process.env.NEXT_PUBLIC_DEFAULT_LONGITUDE || "0";
+    const defaultCity = process.env.NEXT_PUBLIC_DEFAULT_CITY || "City";
+    const defaultRegion = process.env.NEXT_PUBLIC_DEFAULT_REGION || "Region";
+    const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY || "US";
+
+    const lat = car.latitude ?? parseFloat(defaultLat);
+    const lon = car.longitude ?? parseFloat(defaultLon);
     const addressXml = `
         <address format="simple">
           <component name="addr1">${escape(streetAddress)}</component>
-          <component name="city">Mississauga</component>
-          <component name="region">Ontario</component>
-          <component name="country">CA</component>
+          <component name="city">${escape(defaultCity)}</component>
+          <component name="region">${escape(defaultRegion)}</component>
+          <component name="country">${escape(defaultCountry)}</component>
         </address>
         <latitude>${lat}</latitude>
         <longitude>${lon}</longitude>`;

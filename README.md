@@ -1,6 +1,6 @@
 # Auto Diako Hub
 
-**Auto Diako Hub** is an AI-powered dealership inventory management platform built with Next.js and Supabase. It enables automotive dealerships to manage their vehicle inventory, generate professional AI-written listings, and sync inventory to Facebook Automotive Catalog—all from a single dashboard.
+**Auto Diako Hub** is an open-source, AI-powered dealership inventory management platform built with Next.js and Supabase. It enables automotive dealerships to manage their vehicle inventory, generate professional AI-written listings, and sync inventory to Facebook Automotive Catalog — all from a single dashboard.
 
 ## Features
 
@@ -36,7 +36,7 @@
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/amirmahdiKhosravi/auto-diako-hub.git
+git clone https://github.com/YOUR_USERNAME/auto-diako-hub.git
 cd auto-diako-hub
 ```
 
@@ -48,36 +48,23 @@ npm install
 
 ### 3. Configure environment variables
 
-Copy `.env.example` to `.env.local` and fill in your values:
+Copy the example env file and fill in your values:
 
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_or_anon_key
-
-# LLM Provider — choose "openai" or "gemini"
-LLM_PROVIDER=openai
-
-# OpenAI (required when LLM_PROVIDER=openai)
-OPENAI_API_KEY=your_openai_api_key
-OPENAI_MODEL=gpt-4o                          # optional
-OPENAI_EMBEDDING_MODEL=text-embedding-3-small # optional
-
-# Google Gemini (required when LLM_PROVIDER=gemini)
-GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-2.5-flash                # optional
-
-# Facebook Catalog
-NEXT_PUBLIC_BASE_URL=https://yourdomain.com
-NEXT_PUBLIC_DEALER_STREET_ADDRESS=123 Main St, Mississauga, ON
+```bash
+cp .env.example .env.local
 ```
 
-> [!NOTE]
-> `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` accepts both the new **publishable** key and the legacy **anon** key. See the [Supabase announcement](https://github.com/orgs/supabase/discussions/29260) for details.
+See [`.env.example`](.env.example) for all available variables and their descriptions.
+
+> **Note:** `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` accepts both the new **publishable** key and the legacy **anon** key. See the [Supabase announcement](https://github.com/orgs/supabase/discussions/29260) for details.
 >
 > LLM API keys are server-side only (no `NEXT_PUBLIC_` prefix) to keep them secure.
 
-### 4. Run the development server
+### 4. Set up the database
+
+Apply the Supabase migrations in `supabase/migrations/` to your project. You can do this through the Supabase CLI or the dashboard SQL editor.
+
+### 5. Run the development server
 
 ```bash
 npm run dev
@@ -85,7 +72,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### 5. Build for production
+### 6. Build for production
 
 ```bash
 npm run build
@@ -124,8 +111,18 @@ auto-diako-hub/
 │   └── utils.ts
 ├── supabase/
 │   └── migrations/                # Database migration files
-└── public/                        # Static assets
+└── public/                        # Static assets & PWA files
 ```
+
+## Customization
+
+### Branding
+
+Replace `public/app-logo.png` with your own logo. The logo component is in `components/app-logo.tsx` and is used in the login page and dashboard sidebar.
+
+### Default Location
+
+Set `NEXT_PUBLIC_DEFAULT_CITY`, `NEXT_PUBLIC_DEFAULT_REGION`, `NEXT_PUBLIC_DEFAULT_COUNTRY`, `NEXT_PUBLIC_DEFAULT_LATITUDE`, and `NEXT_PUBLIC_DEFAULT_LONGITUDE` in your `.env.local` to configure the fallback location for the Facebook Catalog feed.
 
 ## API Endpoints
 
@@ -157,6 +154,10 @@ Generates a professional vehicle listing description using the configured LLM pr
 
 Returns an RSS/XML feed of all available inventory formatted for Facebook Automotive Catalog import. Cached for 1 hour.
 
+## Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
 ## License
 
-This project is private. All rights reserved.
+This project is licensed under the [MIT License](LICENSE).

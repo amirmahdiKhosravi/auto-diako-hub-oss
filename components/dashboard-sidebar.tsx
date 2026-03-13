@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
-import { RevAvenueLogo } from "@/components/rev-avenue-logo";
+import { AppLogo } from "@/components/app-logo";
 
 const navigation = [
   { name: "Home", href: "/dashboard", icon: LayoutDashboard },
@@ -67,10 +67,10 @@ export function DashboardSidebar({ isMobile = false, onClose }: DashboardSidebar
       {/* Logo/Name */}
       <div className="flex items-center gap-3 px-6 py-6 border-b border-border">
         <div className="flex items-center justify-center w-20 h-12 rounded-lg bg-blue-600 shrink-0 overflow-hidden p-1.5">
-          <RevAvenueLogo width={120} height={36} className="object-contain w-full h-full" />
+          <AppLogo width={120} height={36} className="object-contain w-full h-full" />
         </div>
         <div className="min-w-0 flex-1">
-          <h1 className="text-base font-bold text-foreground whitespace-nowrap" title="Rev Avenue Hub">Rev Avenue Hub</h1>
+          <h1 className="text-base font-bold text-foreground whitespace-nowrap" title="Auto Diako Hub">Auto Diako Hub</h1>
           <p className="text-xs text-muted-foreground">Dealership Manager</p>
         </div>
       </div>
