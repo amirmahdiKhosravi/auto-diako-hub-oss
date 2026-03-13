@@ -58,63 +58,52 @@ export async function GET() {
   <link rel="self" href="${baseUrl}/api/facebook-catalog"/>
 `;
 
-  // 3. Loop through cars and add to XML
+  // Location defaults (read once, used per-vehicle as fallback)
+  const defaultLat = parseFloat(process.env.NEXT_PUBLIC_DEFAULT_LATITUDE || "0");
+  const defaultLon = parseFloat(process.env.NEXT_PUBLIC_DEFAULT_LONGITUDE || "0");
+  const defaultCity = process.env.NEXT_PUBLIC_DEFAULT_CITY || "City";
+  const defaultRegion = process.env.NEXT_PUBLIC_DEFAULT_REGION || "Region";
+  const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY || "US";
+  const supabaseStorageBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vehicles`;
+
+  const getImageUrl = (pathOrUrl: string) => {
+    const s = typeof pathOrUrl === "string" ? pathOrUrl.trim() : "";
+    return s.startsWith("http") ? s : `${supabaseStorageBase}/${s}`.trim();
+  };
+
   cars?.forEach((car) => {
-    // Construct absolute URL for the vehicle page
     const carLink = `${baseUrl}/inventory/${car.id}`;
 
-    // Handle Images: Use image_urls (schema) - ensure full URLs, validate format
     const rawImageUrls = car.image_urls && Array.isArray(car.image_urls) ? car.image_urls : [];
-    const getImageUrl = (pathOrUrl: string) => {
-      const s = typeof pathOrUrl === "string" ? pathOrUrl.trim() : "";
-      return s.startsWith("http") ? s : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vehicles/${s}`.trim();
-    };
-    // Only include valid absolute URLs (Facebook rejects malformed or multiple links)
     const imageUrls = rawImageUrls
       .filter((url: unknown): url is string => typeof url === "string" && isValidFeedUrl(getImageUrl(url)))
       .slice(0, 20);
 
-    // Schema: listed_price, description ?? condition_notes, color
     const price = car.listed_price ?? car.floor_price ?? 0;
-    // Sanitize description: strip URLs so Facebook does not treat it as URL field
-    const rawDescription = car.description ?? car.condition_notes ?? "";
-    const description = stripUrls(rawDescription);
+    const description = stripUrls(car.description ?? car.condition_notes ?? "");
     const exteriorColor = car.color ?? "Unknown";
 
-    // Use real fields from DB, fallbacks for backwards compatibility
     const bodyStyle = (car.body_style || "SEDAN").toUpperCase();
     const transmission = escape(car.transmission || "Automatic");
     const fuelType = (car.fuel_type || "Gasoline").toUpperCase();
     const vehicleCondition = (car.vehicle_condition || "GOOD").toUpperCase();
 
-    // Title: include trim if available
     const title = car.trim
       ? `${car.year} ${car.make} ${car.model} ${car.trim}`
       : `${car.year} ${car.make} ${car.model}`;
 
-    // Build image elements - Facebook nested format
-    const imageElements =
-      imageUrls.length > 0
-        ? imageUrls
-            .map((img: string) => `<image><url>${escape(getImageUrl(img))}</url></image>`)
-            .join("\n        ")
-        : "";
+    const imageElements = imageUrls.length > 0
+      ? imageUrls.map((img: string) => `<image><url>${escape(getImageUrl(img))}</url></image>`).join("\n        ")
+      : "";
 
-    // Mileage: Facebook nested format with KM (uppercase)
     const mileageXml = `
         <mileage>
           <value>${car.mileage ?? 0}</value>
           <unit>KM</unit>
         </mileage>`;
 
-    const defaultLat = process.env.NEXT_PUBLIC_DEFAULT_LATITUDE || "0";
-    const defaultLon = process.env.NEXT_PUBLIC_DEFAULT_LONGITUDE || "0";
-    const defaultCity = process.env.NEXT_PUBLIC_DEFAULT_CITY || "City";
-    const defaultRegion = process.env.NEXT_PUBLIC_DEFAULT_REGION || "Region";
-    const defaultCountry = process.env.NEXT_PUBLIC_DEFAULT_COUNTRY || "US";
-
-    const lat = car.latitude ?? parseFloat(defaultLat);
-    const lon = car.longitude ?? parseFloat(defaultLon);
+    const lat = car.latitude ?? defaultLat;
+    const lon = car.longitude ?? defaultLon;
     const addressXml = `
         <address format="simple">
           <component name="addr1">${escape(streetAddress)}</component>

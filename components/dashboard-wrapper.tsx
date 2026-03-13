@@ -2,9 +2,10 @@
 
 import { useSearchTerm } from "@/lib/search-context";
 import { DashboardContent } from "@/components/dashboard-content";
+import type { Vehicle } from "@/types/vehicle";
 
 interface DashboardWrapperProps {
-  vehicles: any[];
+  vehicles: Vehicle[];
 }
 
 export function DashboardWrapper({ vehicles }: DashboardWrapperProps) {
